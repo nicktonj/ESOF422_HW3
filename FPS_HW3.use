@@ -1,0 +1,201 @@
+model FirstPersonShooter
+
+abstract class FPSState
+  operations
+    see_defeatable()
+      begin
+      end
+
+    see_undefeatable()
+      begin
+      end
+
+    lost_to_opponent()
+      begin
+      end
+
+    receive_blow(i:Integer)
+      begin
+      end
+
+    reset()
+      begin
+      end
+end
+
+class Neutral < FPSState
+  operations
+    see_defeatable()
+      begin
+      end
+
+    see_undefeatable()
+      begin
+      end
+
+    lost_to_opponent()
+      begin
+      end
+
+    receive_blow(i:Integer)
+      begin
+      end
+
+    reset()
+      begin
+      end
+end
+
+class Attack < FPSState
+  operations
+    see_defeatable()
+      begin
+      end
+
+    see_undefeatable()
+      begin
+      end
+
+    lost_to_opponent()
+      begin
+      end
+
+    receive_blow(i:Integer)
+      begin
+      end
+
+    reset()
+      begin
+      end
+end
+
+class Panic < FPSState
+  operations
+    see_defeatable()
+      begin
+      end
+
+    see_undefeatable()
+      begin
+      end
+
+    lost_to_opponent()
+      begin
+      end
+
+    receive_blow(i:Integer)
+      begin
+      end
+
+    reset()
+      begin
+      end
+end
+
+class Die < FPSState
+  operations
+    see_defeatable()
+      begin
+      end
+
+    see_undefeatable()
+      begin
+      end
+
+    lost_to_opponent()
+      begin
+      end
+
+    receive_blow(i:Integer)
+      begin
+      end
+
+    reset()
+      begin
+      end
+end
+
+class FPS
+  attributes
+    health : Integer init : 0
+    NeutralState : FPSState
+    AttackState : FPSState
+    PanicState : FPSState
+    DieState : FPSState  
+
+  operations
+    initInstance()
+      begin
+        self.health := 0;
+        self.NeutralState := new Neutral;
+        self.AttackState := new Attack;
+        self.PanicState := new Panic;
+        self.DieState := new Die;
+
+        self.FPSState := self.NeutralState
+      end
+
+    
+    see_defeatable()
+      begin
+        self.FPSState.see_defeatable();
+      end
+
+    see_undefeatable()
+      begin
+        self.FPSState.see_undefeatable();
+      end
+
+    lost_to_opponent()
+      begin
+        self.FPSState.lost_to_opponent();
+      end
+
+    receive_blow(i:Integer)
+      begin
+        self.FPSState.receive_blow(i);
+      end
+
+    reset()
+      begin
+        self.FPSState.reset();
+      end
+
+  statemachines
+    psm StatePattern
+      states
+        startUp:initial
+          Neutral	[FPSState = NeutralState]
+          Attack	[FPSState = AttackState]
+          Panic		[FPSState = PanicState]
+          Die		[FPSState = DieState]
+      transitions
+        startUp -> Neutral {create}
+    end
+
+    psm Usage
+      states
+        startUp:initial
+      transitions
+        startUp -> Neutral	{create}
+    end
+end
+
+--associations
+association firstPersonShooterState between
+  FPSState[1]
+  FPS[1]
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
