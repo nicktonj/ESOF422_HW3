@@ -138,6 +138,8 @@ end
 class FPS
   attributes
     health : Integer init : 0
+    
+    --This fpsState is needed for inside this class
     fpsState : FPSState
     NeutralState : FPSState
     AttackState : FPSState
