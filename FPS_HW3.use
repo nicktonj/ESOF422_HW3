@@ -14,11 +14,11 @@ abstract class FPSState
       begin
       end
 
-    lost_to_opponent()
+    run_from_opponent()
       begin
       end
 
-    receive_blow()
+    receive_blow(i:Integer)
       begin
       end
 
@@ -32,28 +32,33 @@ class Neutral < FPSState
     see_defeatable()
       begin
            WriteLine('Saw Defeatable');
+           WriteLine('Current State: Attack');
            self.fPS.fpsState := self.fPS.AttackState;
       end
 
     see_undefeatable()
       begin
            WriteLine('Saw Undefeatable');
+           WriteLine('Current State: Panic');
            self.fPS.fpsState := self.fPS.PanicState;
       end
 
-    lost_to_opponent()
+    run_from_opponent()
       begin
            WriteLine('There is no such function in this state.');
+           WriteLine('Current State: Neutral');
       end
 
-    receive_blow()
+    receive_blow(i:Integer)
       begin
            WriteLine('There is no such function in this state.');
+           WriteLine('Current State: Neutral');
       end
 
     reset()
       begin
            WriteLine('Reseting');
+           WriteLine('Current State: Neutral');
            self.fPS.health := 100;
            self.fPS.fpsState := self.fPS.NeutralState;
       end
@@ -64,28 +69,42 @@ class Attack < FPSState
     see_defeatable()
       begin
            WriteLine('There is no such function in this state.');
+           WriteLine('Current State: Attack');
       end
 
     see_undefeatable()
       begin
            WriteLine('There is no such function in this state.');
+           WriteLine('Current State: Attack');
       end
 
-    lost_to_opponent()
+    run_from_opponent()
       begin
-           WriteLine('Lost To Opponent');
+           WriteLine('Ran From Opponent');
+           WriteLine('Current State: Neutral');
            self.fPS.fpsState := self.fPS.NeutralState;
       end
 
-    receive_blow()
+    receive_blow(i:Integer)
       begin
            WriteLine('Received Blow');
-           self.fPS.fpsState := self.fPS.DieState;
+           self.fPS.health := self.fPS.health - i;
+
+           if (self.fPS.health < 1) then
+             WriteLine('Current State: Dead');
+             self.fPS.fpsState := self.fPS.DieState;
+           end;
+
+           if (self.fPS.health > 0) then
+             WriteLine('Current State: Attack');
+             self.fPS.fpsState := self.fPS.AttackState;
+           end;
       end
 
     reset()
       begin
            WriteLine('Reseting');
+           WriteLine('Current State: Neutral');
            self.fPS.health := 100;
            self.fPS.fpsState := self.fPS.NeutralState;
       end
@@ -96,28 +115,42 @@ class Panic < FPSState
     see_defeatable()
       begin
            WriteLine('There is no such function in this state.');
+           WriteLine('Current State: Panic');
       end
 
     see_undefeatable()
       begin
            WriteLine('There is no such function in this state.');
+           WriteLine('Current State: Panic');
       end
 
-    lost_to_opponent()
+    run_from_opponent()
       begin
-           WriteLine('Lost To Opponent');
+           WriteLine('Ran From Opponent');
+           WriteLine('Current State: Neutral');
            self.fPS.fpsState := self.fPS.NeutralState;
       end
 
-    receive_blow()
+    receive_blow(i:Integer)
       begin
            WriteLine('Received Blow');
-           self.fPS.fpsState := self.fPS.DieState;
+           self.fPS.health := self.fPS.health - i;
+
+           if (self.fPS.health < 1) then
+             WriteLine('Current State: Dead');
+             self.fPS.fpsState := self.fPS.DieState;
+           end;
+
+           if (self.fPS.health > 0) then
+             WriteLine('Current State: Dead');
+             self.fPS.fpsState := self.fPS.PanicState;
+           end;
       end
 
     reset()
       begin
            WriteLine('Reseting');
+           WriteLine('Current State: Neutral');
            self.fPS.health := 100;
            self.fPS.fpsState := self.fPS.NeutralState;
       end
@@ -128,26 +161,35 @@ class Die < FPSState
     see_defeatable()
       begin
            WriteLine('There is no such function in this state.');
+           WriteLine('Current State: Dead');
+           WriteLine('You must reset');
       end
 
     see_undefeatable()
       begin
            WriteLine('There is no such function in this state.');
+           WriteLine('Current State: Dead');
+           WriteLine('You must reset');
       end
 
-    lost_to_opponent()
+    run_from_opponent()
       begin
            WriteLine('There is no such function in this state.');
+           WriteLine('Current State: Dead');
+           WriteLine('You must reset');
       end
 
-    receive_blow()
+    receive_blow(i:Integer)
       begin
            WriteLine('There is no such function in this state.');
+           WriteLine('Current State: Dead');
+           WriteLine('You must reset');
       end
 
     reset()
       begin
            WriteLine('Reseting');
+           WriteLine('Current State: Neutral');
            self.fPS.health := 100;
            self.fPS.fpsState := self.fPS.NeutralState;
       end
@@ -186,14 +228,14 @@ class FPS
         self.fpsState.see_undefeatable();
       end
 
-    lost_to_opponent()
+    run_from_opponent()
       begin
-        self.fpsState.lost_to_opponent();
+        self.fpsState.run_from_opponent();
       end
 
-    receive_blow()
+    receive_blow(i:Integer)
       begin
-        self.fpsState.receive_blow();
+        self.fpsState.receive_blow(i);
       end
 
     reset()
@@ -215,33 +257,37 @@ class FPS
           Neutral -> Panic { [fpsState = NeutralState] see_undefeatable() }
           Neutral -> Neutral { [fpsState = NeutralState] reset() }
           Attack -> Neutral { [fpsState = AttackState] reset() }
-          Attack -> Neutral { [fpsState = AttackState] lost_to_opponent() }
-          Attack -> Die { [fpsState = AttackState] receive_blow() }
+          Attack -> Neutral { [fpsState = AttackState] run_from_opponent() }
+          Attack -> Attack { [health - i > 0 and fpsState = AttackState] receive_blow() }
+          Attack -> Die { [health - i < 1 and fpsState = AttackState] receive_blow() }
           Panic -> Neutral { [fpsState = PanicState] reset() }
-          Panic -> Neutral { [fpsState = PanicState] lost_to_opponent() }
-          Panic -> Die { [fpsState = PanicState] receive_blow() }
+          Panic -> Neutral { [fpsState = PanicState] run_from_opponent() }
+          Panic -> Panic { [health - i > 0 and fpsState = PanicState] receive_blow() }
+          Panic -> Die { [health - i < 1 and fpsState = PanicState] receive_blow() }
           Die -> Neutral { [fpsState = DieState] reset() }
     end
 
     psm Usage
       states
         startUp:initial
-          Neutral	[health = 100]
-          Attack	[health > 0 and health < 100]
-          Panic		[health > 0 and health < 100]
-          Die		[health = 0]
+        Neutral	[health = 100]
+        Attack	[health > 0 and health < 100]
+        Panic	[health > 0 and health < 100]
+        Die	[health = 0]
       transitions
         startUp -> Neutral	{ create }
-          Neutral -> Attack { see_defeatable() }
-          Neutral -> Panic { see_undefeatable() }
-          Neutral -> Neutral { reset() }
-          Attack -> Neutral { reset() }
-          Attack -> Neutral { lost_to_opponent() }
-          Attack -> Die { receive_blow() }
-          Panic -> Neutral { reset() }
-          Panic -> Neutral { lost_to_opponent() }
-          Panic -> Die { receive_blow() }
-          Die -> Neutral { reset() }
+        Neutral -> Neutral { reset() }
+        Neutral -> Attack { see_defeatable() }
+        Neutral -> Panic { see_undefeatable() }
+        Attack -> Neutral { reset() }
+        Attack -> Neutral { run_from_opponent() }
+        Attack -> Attack { [health - i > 0] receive_blow() }
+        Attack -> Die { [health - i < 1] receive_blow() }
+        Panic -> Neutral { reset() }
+        Panic -> Neutral { run_from_opponent() }
+        Panic -> Panic { [health - i > 0] receive_blow() }
+        Panic -> Die { [health - i < 1] receive_blow() }
+        Die -> Neutral { reset() }
     end
 end
 
