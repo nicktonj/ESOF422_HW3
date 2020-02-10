@@ -27,6 +27,11 @@ abstract class FPSState
       end
 end
 
+
+
+
+
+
 class Neutral < FPSState
   operations
     see_defeatable()
@@ -63,6 +68,11 @@ class Neutral < FPSState
            self.fPS.fpsState := self.fPS.NeutralState;
       end
 end
+
+
+
+
+
 
 class Attack < FPSState
   operations
@@ -110,6 +120,12 @@ class Attack < FPSState
       end
 end
 
+
+
+
+
+
+
 class Panic < FPSState
   operations
     see_defeatable()
@@ -156,6 +172,12 @@ class Panic < FPSState
       end
 end
 
+
+
+
+
+
+
 class Die < FPSState
   operations
     see_defeatable()
@@ -194,6 +216,12 @@ class Die < FPSState
            self.fPS.fpsState := self.fPS.NeutralState;
       end
 end
+
+
+
+
+
+
 
 class FPS
   attributes
@@ -290,6 +318,11 @@ class FPS
         Die -> Neutral { reset() }
     end
 end
+
+
+
+
+
 
 --associations
 association firstPersonShooterState between
