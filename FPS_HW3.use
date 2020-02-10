@@ -283,7 +283,6 @@ class FPS
         startUp -> Neutral	{ create }
           Neutral -> Attack { [fpsState = NeutralState] see_defeatable() }
           Neutral -> Panic { [fpsState = NeutralState] see_undefeatable() }
-          Neutral -> Neutral { [fpsState = NeutralState] reset() }
           Attack -> Neutral { [fpsState = AttackState] reset() }
           Attack -> Neutral { [fpsState = AttackState] run_from_opponent() }
           Attack -> Attack { [health - i > 0 and fpsState = AttackState] receive_blow() }
@@ -298,13 +297,12 @@ class FPS
     psm Usage
       states
         startUp:initial
-        Neutral	[health = 100]
-        Attack	[health > 0 and health < 100]
-        Panic	[health > 0 and health < 100]
+        Neutral	[health <= 100]
+        Attack	[health > 0 and health <= 100]
+        Panic	[health > 0 and health <= 100]
         Die	[health = 0]
       transitions
         startUp -> Neutral	{ create }
-        Neutral -> Neutral { reset() }
         Neutral -> Attack { see_defeatable() }
         Neutral -> Panic { see_undefeatable() }
         Attack -> Neutral { reset() }
